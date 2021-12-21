@@ -1,0 +1,5 @@
+numpy
+torch
+pandas
+transformers>=4.0.0
+sentencepiece

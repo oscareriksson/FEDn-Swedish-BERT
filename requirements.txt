@@ -1,0 +1,6 @@
+pandas
+torch
+sentencepiece
+transformers
+datasets
+

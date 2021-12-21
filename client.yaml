@@ -1,0 +1,6 @@
+network_id: reducer-network
+controller:
+    discover_host: reducer
+    discover_port: 8090
+    token: reducer_token
+    checksum: 57be369c28f7fd7b7bbd365e4b101c37
