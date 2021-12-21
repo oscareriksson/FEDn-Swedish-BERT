@@ -1,7 +1,7 @@
 *.csv
-./data/*
-./package/*
-./initial_model/*
+data/
+package/
+initial_model/
 
 #certificate files
 *.pem
