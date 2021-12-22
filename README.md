@@ -75,25 +75,26 @@ cp data/clients/0/*.csv data/
 When clients are running, navigate to the 'Control' page of the Reducer to start the training. 
 
 ### Configuring the client
-Some settings are possible to configure to vary the conditions for the training. These configurations are expsosed in the file 'settings.yaml': 
+Some settings are possible to configure to vary the conditions for the training. These configurations are expsosed in the file 'client/settings.yaml': 
 
 ```yaml
 # Base BERT model
 base_model: "KB/albert-base-swedish-cased-alpha"
 # Maximum number of tokens in each review
-max_text_length: 50
+max_text_length: 35
 # Fraction of client data to use for training
-nr_training_samples: 300
+nr_training_samples: 50
 # Fraction of client data to use for testing
-nr_test_samples: 100
+nr_test_samples: 50
 # Batch size
-batch_size: 16
+batch_size: 8
 # Nr of epochs
 epochs: 1
 ```
+These default settings can be used as a small test. For better performance, increase number of samples and text length limit and/or use the "KB/bert-base-swedish-cased" model.
 ### Test results
 Below are two test results using BERT and ALBERT from @Kungbib. Note that these models are quite big (BERT ~500MB and ALBERT ~50MB) and can require some time to train, especially without GPU.
-Take this into consideration when selecting the size of your experiment, i.e. number of clients, amount of data, length of text samples, number of training rounds, etc.
+Take this into consideration when selecting the size of your experiment, i.e. number of clients, amount of data, length of text samples, number of training rounds, etc. Support for CUDA is implemented but this has not been tested.
 
 Below two tests have been executed using 2 clients and 3 training rounds.
 #### Test 1
