@@ -11,24 +11,20 @@ from fedn.utils.pytorchhelper import PytorchHelper
 from tqdm import tqdm
 
 
-def train(model, data, loss_fn, optimizer, settings):
+def train(model, device, train_loader, optimizer, settings):
     print("-- RUNNING TRAINING --", flush=True)
-
-    x_train, y_train = read_data(data, settings['nr_training_samples'])
-    train_set = ReviewsDataset(x_train, y_train, settings['max_text_length'], settings['base_model'])
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=settings['batch_size'], num_workers=4)
 
     model.train()
 
     for i in range(settings['epochs']):
         for d in tqdm(train_loader):
-            input_ids = d["input_ids"]
-            attention_mask = d["attention_mask"]
-            targets = d["targets"]
+            input_ids = d["input_ids"].to(device)
+            attention_mask = d["attention_mask"].to(device)
+            targets = d["targets"].to(device)
 
             optimizer.zero_grad()
             output = model(input_ids=input_ids, attention_mask=attention_mask)
-            error = loss_fn(output, targets)
+            error = torch.nn.CrossEntropyLoss()(output, targets)
             error.backward()
             optimizer.step()
 
@@ -45,12 +41,19 @@ if __name__ == '__main__':
             raise e
 
     helper = PytorchHelper()
-    model = SentimentClassifier(settings['base_model'])
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = SentimentClassifier(settings['base_model']).to(device)
     model.load_state_dict(np_to_weights(helper.load_model(sys.argv[1])))
 
+    x_train, y_train = read_data("../data/train.csv", settings['nr_training_samples'])
+    train_set = ReviewsDataset(x_train, y_train, settings['max_text_length'], settings['base_model'])
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=settings['batch_size'], num_workers=4)
+
     model = train(model,
-                  "../data/train.csv",
-                  torch.nn.CrossEntropyLoss(),
+                  device,
+                  train_loader,
                   torch.optim.Adam(model.parameters(), lr=1e-3, eps=1e-7),
                   settings)
 

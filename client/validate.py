@@ -11,7 +11,7 @@ from models.bert_pytorch_model import SentimentClassifier
 from tqdm import tqdm
 
 
-def validate(model, loss_function, test_data, train_data, settings):
+def validate(model, device, test_loader, train_loader, settings):
     print("-- RUNNING VALIDATION --", flush=True)
 
     def evaluate(data_loader):
@@ -20,31 +20,23 @@ def validate(model, loss_function, test_data, train_data, settings):
         pred_correct = 0
         with torch.no_grad():
             for d in tqdm(data_loader):
-                input_ids = d["input_ids"]
-                attention_mask = d["attention_mask"]
-                targets = d["targets"]
+                input_ids = d["input_ids"].to(device)
+                attention_mask = d["attention_mask"].to(device)
+                targets = d["targets"].to(device)
 
                 output = model(input_ids=input_ids, attention_mask=attention_mask)
-                loss += settings['batch_size'] * loss_function(output, targets).item()
+                loss += settings['batch_size'] * torch.nn.CrossEntropyLoss()(output, targets).item()
                 pred = output.argmax(dim=1, keepdim=True)
                 pred_correct += pred.eq(targets.view_as(pred)).sum().item()
             loss /= len(data_loader.dataset)
             acc = pred_correct / len(data_loader.dataset)
         return float(loss), float(acc)
 
-    x_test, y_test = read_data(test_data, settings['nr_test_samples'])
-    test_set = ReviewsDataset(x_test, y_test, settings['max_text_length'], settings['base_model'])
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=settings['batch_size'], num_workers=4)
-
-    x_train, y_train = read_data(train_data, settings['nr_training_samples'])
-    train_set = ReviewsDataset(x_train, y_train, settings['max_text_length'], settings['base_model'])
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=settings['batch_size'], num_workers=4)
-
     try:
         test_loss, test_acc = evaluate(test_loader)
-        print("Test acc: {}".format(test_acc))
+        # print("Test acc: {}".format(test_acc))
         train_loss, train_acc = evaluate(train_loader)
-        print("Train acc: {}".format(train_acc))
+        # print("Train acc: {}".format(train_acc))
 
     except Exception as e:
         print("failed to validate the model {}".format(e), flush=True)
@@ -71,11 +63,25 @@ if __name__ == '__main__':
             raise e
 
     helper = PytorchHelper()
-    model = SentimentClassifier(settings['base_model'])
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = SentimentClassifier(settings['base_model']).to(device)
     model.load_state_dict(np_to_weights(helper.load_model(sys.argv[1])))
 
-    loss_fn = torch.nn.CrossEntropyLoss()
-    report = validate(model, loss_fn, '../data/test.csv', '../data/train.csv', settings)
+    x_test, y_test = read_data('../data//test.csv', settings['nr_test_samples'])
+    test_set = ReviewsDataset(x_test, y_test, settings['max_text_length'], settings['base_model'])
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=settings['batch_size'], num_workers=4)
+
+    x_train, y_train = read_data('../data//train.csv', settings['nr_training_samples'])
+    train_set = ReviewsDataset(x_train, y_train, settings['max_text_length'], settings['base_model'])
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=settings['batch_size'], num_workers=4)
+
+    report = validate(model,
+                      device,
+                      test_loader,
+                      train_loader,
+                      settings)
 
     with open(sys.argv[2], "w") as fh:
         fh.write(json.dumps(report))
