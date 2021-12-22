@@ -1,6 +1,8 @@
 # FEDn example - Sentiment analysis on Swedish reviews with BERT  
 This repository contains an example FEDn client to train a Swedish BERT model for sentiment analysis on Swedish reviews.
-The model is implemented using Pytorch and Huggingface Transformers.
+The model is implemented using Pytorch and Huggingface Transformers. 
+
+> This example has only been tested in a pseudo-distributed environment. See test results at the bottom of this page.
 
 > Note that this example shows how to configure FEDn for training, and how to configure and start clients. It is assumed that a FEDn network is aleady up and running with a blank, unconfigured Reducer. If this is not the case, start here: https://github.com/scaleoutsystems/fedn/blob/master/README.md
 
@@ -89,3 +91,29 @@ batch_size: 16
 # Nr of epochs
 epochs: 1
 ```
+### Test results
+#### Test 1
+Settings:
+```yaml  
+base_model: "KB/albert-base-swedish-cased-alpha"
+max_text_length: 50
+nr_training_samples: 300
+nr_test_samples: 100
+batch_size: 16
+epochs: 1
+```
+Results:
+![Albert resuls](https://ibb.co/QmNFPLr)
+
+#### Test 2
+Settings:
+```yaml  
+base_model: "KB/bert-base-swedish-cased"
+max_text_length: 35
+nr_training_samples: 250
+nr_test_samples: 100
+batch_size: 8
+epochs: 1
+```
+Results:
+![Bert resuls](https://ibb.co/0c96jvv)
