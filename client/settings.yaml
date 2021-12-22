@@ -1,7 +1,7 @@
 # Parameters for local training
 base_model: "KB/albert-base-swedish-cased-alpha"
-max_text_length: 50
-nr_training_samples: 300
-nr_test_samples: 100
-batch_size: 16
+max_text_length: 35
+nr_training_samples: 50
+nr_test_samples: 50
+batch_size: 8
 epochs: 1
