@@ -108,6 +108,7 @@ batch_size: 16
 epochs: 1
 ```
 Results:
+
 ![Albert results](https://i.ibb.co/pxmrdC3/albertres.png)
 
 #### Test 2
@@ -121,4 +122,5 @@ batch_size: 8
 epochs: 1
 ```
 Results:
+
 ![Bert results](https://i.ibb.co/mrjfpvF/bertres.png)
