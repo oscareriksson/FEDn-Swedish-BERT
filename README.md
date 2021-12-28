@@ -109,7 +109,7 @@ epochs: 1
 ```
 Results:
 
-![Albert results](https://i.ibb.co/pxmrdC3/albertres.png)
+![Albert results](https://i.imgur.com/it9mAYb.png)
 
 #### Test 2
 Settings:
@@ -123,4 +123,4 @@ epochs: 1
 ```
 Results:
 
-![Bert results](https://i.ibb.co/mrjfpvF/bertres.png)
+![Bert results](https://i.imgur.com/RB2fmCT.png)
